@@ -154,3 +154,6 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+PointAnaly/check.txt
+PointAnaly/result.csv
+PointAnaly/result2.csv
