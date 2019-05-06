@@ -1,3 +1,6 @@
+#ifndef _POINT_H_
+#define _POINT_H_
+
 #include <vector>
 #include <string>
 using namespace std;
@@ -21,3 +24,5 @@ void readCheckPoints(string path, vector<zPoint> &checkpts, double ox, double oy
 double ccltDistancePt2Sg(zPoint p, zPoint m, zPoint n);
 
 void ccltCheckDistances(vector<zPoint> checks, vector<vector<zSegment> > segments, vector<vector<double> > &distances);
+
+#endif

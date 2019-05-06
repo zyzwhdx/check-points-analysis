@@ -17,6 +17,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/extract_indices.h>
 #include "point.h"
+#include "fitcircle.h"
+#include <complex>
 
 using namespace pcl;
 using namespace std;
@@ -31,30 +33,37 @@ void main()
 
 	vector<vector<zPoint> > vertices, rvertices;//边缘顶点们，每个环一个vector
 	vector<vector<zSegment> > segments, rsegments;//边缘线段们，每个环一个vector
-	vector<zPoint> checks;   //二维的检查点们
-	vector<vector<double> > distances, rdistances;//检查点到所有边的距离
+	//vector<zPoint> checks;   //二维的检查点们
+	//vector<vector<double> > distances, rdistances;//检查点到所有边的距离
 	double ox, oy;
-	readVertices("D:\\exp\\h4\\vertices.txt", vertices, segments, ox, oy);
-	readVertices("D:\\exp\\h4\\refine_vertices.txt", rvertices, rsegments, ox, oy);
+	readVertices("D:\\exp\\a2\\vertices.txt", vertices, segments, ox, oy);
+	readVertices("D:\\exp\\a2\\refine_vertices.txt", rvertices, rsegments, ox, oy);
 
-	readCheckPoints("D:\\exp\\h4\\CheckEdge.txt", checks, ox, oy);
+	//readCheckPoints("D:\\exp\\h1\\CheckEdge.txt", checks, ox, oy);
 
-	ccltCheckDistances(checks, segments, distances);
-	ccltCheckDistances(checks, rsegments, rdistances);
+	//ccltCheckDistances(checks, segments, distances);
+	//ccltCheckDistances(checks, rsegments, rdistances);
 
-	ofstream ofs("result2.csv");
-	for (int i = 0; i < checks.size(); i++)
-	{
-		ofs << to_string(distances[i][0]) << "," << to_string(rdistances[i][0]) << endl;
-	}
-	ofs.close();
+	//ofstream ofs("result2.csv");
+	//for (int i = 0; i < checks.size(); i++)
+	//{
+	//	ofs << to_string(distances[i][0]) << "," << to_string(rdistances[i][0]) << endl;
+	//}
+	//ofs.close();
 
-	ofstream ofs1("check.txt");
-	for (int i = 0; i < checks.size(); i++)
-	{
-		ofs1 << to_string(ox + checks[i].x) << "," << to_string(oy + checks[i].y) << "," << to_string(100 * distances[i][0]) << endl;
-	}
-	ofs1.close();
+	//ofstream ofs1("check.txt");
+	//for (int i = 0; i < checks.size(); i++)
+	//{
+	//	ofs1 << to_string(ox + checks[i].x) << "," << to_string(oy + checks[i].y) << "," << to_string(100 * distances[i][0]) << endl;
+	//}
+	//ofs1.close();
+
+	PointCloud<PointXYZI> curvatures;
+
+	ccltCircle(rvertices, curvatures);
+
+	dataIo dio;
+	dio.writePointCloudIntoLasFile("curvature.las", curvatures, ox, oy);
 
 	cout << "end of program" << endl;
 	cin.get();

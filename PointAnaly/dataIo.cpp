@@ -104,6 +104,44 @@ bool dataIo::writePointCloudIntoLasFile(const std::string &fileName, pointCloudX
 	return false;
 }
 
+bool dataIo::writePointCloudIntoLasFile(const std::string &fileName, pointCloudXYZI &pointCloud, double ox, double oy)
+{
+	pointCloudBound bound;
+	getCloudBound(pointCloud, bound);
+
+	std::ofstream ofs;
+	ofs.open(fileName, std::ios::out | std::ios::binary);
+	if (ofs.is_open())
+	{
+		liblas::Header header;
+		header.SetDataFormatId(liblas::ePointFormat2);
+		header.SetVersionMajor(1);
+		header.SetVersionMinor(2);
+		header.SetMin(bound.minx + ox, bound.miny + oy, bound.minz);
+		header.SetMax(bound.maxx + ox, bound.maxy + oy, bound.maxz);
+		header.SetOffset(ox + (bound.minx + bound.maxx) / 2.0, oy + (bound.miny + bound.maxy) / 2.0, (bound.minz + bound.maxz) / 2.0);
+		header.SetScale(0.001, 0.001, 0.0001);
+		header.SetPointRecordsCount(pointCloud.points.size());
+
+		liblas::Writer writer(ofs, header);
+		liblas::Point pt(&header);
+
+		for (int i = 0; i < pointCloud.points.size(); i++)
+		{
+			pt.SetCoordinates(double(pointCloud.points[i].x) + ox, double(pointCloud.points[i].y) + oy, double(pointCloud.points[i].z));
+			pt.SetIntensity(pointCloud.points[i].intensity);
+			writer.WritePoint(pt);
+		}
+		ofs.flush();
+		ofs.close();
+
+		return true;
+	}
+
+	return false;
+}
+
+
 bool dataIo::readPointCloudFromPlyFileA(const std::string &fileName, pointCloudXYZI &pointCloud)
 {
 	if (pcl::io::loadPLYFile(fileName, pointCloud) == -1) //* load the file

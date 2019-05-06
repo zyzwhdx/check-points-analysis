@@ -49,7 +49,7 @@ public:
 	
 	bool writePointCloudIntoLasFile(const std::string &fileName, pointCloudXYZI &pointCloud);
 
-
+	bool writePointCloudIntoLasFile(const std::string &fileName, pointCloudXYZI &pointCloud, double ox, double oy);
 
 	void getCloudBound(pointCloudXYZI & cloud, pointCloudBound & bound)
 	{

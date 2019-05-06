@@ -169,11 +169,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="dataIo.h" />
+    <ClInclude Include="fitcircle.h" />
     <ClInclude Include="LasIO.h" />
     <ClInclude Include="point.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dataIo.cpp" />
+    <ClCompile Include="fitcircle.cpp" />
     <ClCompile Include="LasIO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="point.cpp" />
