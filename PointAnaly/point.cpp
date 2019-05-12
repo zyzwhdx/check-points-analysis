@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 using namespace std;
@@ -126,4 +129,117 @@ void ccltCheckDistances(vector<zPoint> checks, vector<vector<zSegment> > segment
 		}
 		sort(distances[i].begin(), distances[i].end());
 	}
+}
+
+void readEdges(string path, eString &pts, double &ox, double &oy)
+{
+	ifstream ifs(path);
+	string str;
+
+	while (getline(ifs, str))
+	{
+		vector<string> sVec;
+		boost::split(sVec, str, boost::is_any_of(", "), boost::token_compress_on);
+
+		ePoint pt;
+		pt.x = atof(sVec[0].c_str()) - ox;
+		pt.y = atof(sVec[1].c_str()) - oy;
+		pt.z = atof(sVec[2].c_str());
+		pts.push_back(pt);
+	}
+
+	//按y值从小到大排序
+	sort(pts.begin(), pts.end(), compy);
+
+	for (size_t i = 0; i < pts.size(); i++)
+	{
+		pts[i].id = i;
+	}
+}
+
+bool compy(ePoint &a, ePoint &b)
+{
+	if (a.y < b.y)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool compid(ePoint &a, ePoint &b)
+{
+	if (a.id < b.id)
+	{
+		return true;
+	}
+	return false;
+}
+
+void iterativeBreakLines(eString &oPts, eEdge &whole_edge)
+{
+	if (oPts.size() < 30)
+	{
+		whole_edge.push_back(oPts);
+		return;
+	}
+	int pos;
+	if (ccltMaxOffset(oPts, pos) < 30)
+	{
+		whole_edge.push_back(oPts);
+		return;
+	}
+
+	eString a;
+	eString b;
+	for (size_t i = 0; i <= pos - oPts.front().id; i++)
+	{
+		a.push_back(oPts[i]);
+	}
+	for (size_t i = pos - oPts.front().id + 1; i < oPts.size(); i++)
+	{
+		b.push_back(oPts[i]);
+	}
+	iterativeBreakLines(a, whole_edge);
+	iterativeBreakLines(b, whole_edge);
+}
+
+
+double ccltMaxOffset(eString &pts, int &pos_maxoft)
+{
+	if (pts.size() < 4)
+		return 0.0;
+
+	sort(pts.begin(), pts.end(), compid);
+
+	zPoint source;
+	zPoint target;
+
+	source.x = pts[0].x;
+	source.y = pts[0].y;
+	target.x = pts[pts.size() - 1].x;
+	target.y = pts[pts.size() - 1].y;
+
+	double max_ost = 0.0;
+	int max_id = 0;
+
+	for (size_t i = 1; i < pts.size() - 1; i++)
+	{
+		zPoint cPt;
+		cPt.x = pts[i].x;
+		cPt.y = pts[i].y;
+		double distance = ccltDistancePt2Sg(cPt, source, target);
+		if (distance > max_ost)
+		{
+			max_ost = distance;
+			max_id = pts[i].id;
+		}
+	}
+	pos_maxoft = max_id;
+	return max_ost;
+}
+
+int zrand()
+{
+	srand(int(time(0)));
+	return rand() % 99 + 1;
 }

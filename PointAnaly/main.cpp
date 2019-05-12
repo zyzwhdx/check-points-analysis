@@ -31,15 +31,15 @@ void main()
 	//MinBound bound = las.getMinBound();
 	//pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud = PCcloud.makeShared();
 
-	vector<vector<zPoint> > vertices, rvertices;//边缘顶点们，每个环一个vector
-	vector<vector<zSegment> > segments, rsegments;//边缘线段们，每个环一个vector
+	//vector<vector<zPoint> > vertices, rvertices;//边缘顶点们，每个环一个vector
+	//vector<vector<zSegment> > segments, rsegments;//边缘线段们，每个环一个vector
 	//vector<zPoint> checks;   //二维的检查点们
 	//vector<vector<double> > distances, rdistances;//检查点到所有边的距离
-	double ox, oy;
-	readVertices("D:\\exp\\a2\\vertices.txt", vertices, segments, ox, oy);
-	readVertices("D:\\exp\\a2\\refine_vertices.txt", rvertices, rsegments, ox, oy);
+	//double ox, oy;
+	//readVertices("D:\\exp\\A4\\vertices.txt", vertices, segments, ox, oy);
+	//readVertices("D:\\exp\\A4\\refine_vertices.txt", rvertices, rsegments, ox, oy);
 
-	//readCheckPoints("D:\\exp\\h1\\CheckEdge.txt", checks, ox, oy);
+	//readCheckPoints("D:\\exp\\A4\\CheckEdge.txt", checks, ox, oy);
 
 	//ccltCheckDistances(checks, segments, distances);
 	//ccltCheckDistances(checks, rsegments, rdistances);
@@ -58,12 +58,32 @@ void main()
 	//}
 	//ofs1.close();
 
-	PointCloud<PointXYZI> curvatures;
+	//PointCloud<PointXYZI> curvatures;
 
-	ccltCircle(rvertices, curvatures);
+	//ccltCircle(rvertices, curvatures);
 
-	dataIo dio;
-	dio.writePointCloudIntoLasFile("curvature.las", curvatures, ox, oy);
+	//dataIo dio;
+	//dio.writePointCloudIntoLasFile("curvature.las", curvatures, ox, oy);
+
+	double ox = 486000.0;
+	double oy = 3287000.0;
+
+	eString original_edges;
+	eEdge final_edge;
+	readEdges("edges.txt", original_edges, ox, oy);
+
+	iterativeBreakLines(original_edges, final_edge);
+
+	ofstream ofs1("break.txt");
+	for (int i = 0; i < final_edge.size(); i++)
+	{
+		int itst = rand() % 99 + 1;
+		for (int j = 0; j < final_edge[i].size(); j++)
+		{
+			ofs1 << to_string(ox + final_edge[i][j].x) << "," << to_string(oy + final_edge[i][j].y) << "," << to_string(final_edge[i][j].z) << "," << to_string(itst) << endl;
+		}
+	}
+	ofs1.close();
 
 	cout << "end of program" << endl;
 	cin.get();
