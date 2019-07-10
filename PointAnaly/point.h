@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+using namespace pcl;
 using namespace std;
 
 struct zPoint
@@ -30,6 +33,44 @@ struct ePoint
 	}
 };
 
+struct eDistance 
+{
+	double xx;
+	double yy;
+	double zz;
+	double dis;
+};
+
+struct normalPara
+{
+	double ave;
+	double stv;
+
+	normalPara()
+	{
+		ave = 0.0;
+		stv = 1.0;
+	}
+};
+
+struct polyPara
+{
+	double a;
+	double b;
+	double c;
+	double d;
+	double e;
+	polyPara()
+	{
+		a = b = c = d = e = 0.0;
+	}
+};
+
+enum extent_dir
+{
+	e_x, e_y
+};
+
 //一串边缘点定义一个string
 typedef vector<ePoint> eString;
 
@@ -38,22 +79,46 @@ typedef vector<eString> eEdge;
 
 void readVertices(string path, vector<vector<zPoint> > &vertices, vector<vector<zSegment> > &segments, double &ox, double &oy);
 
-void readCheckPoints(string path, vector<zPoint> &checkpts, double ox, double oy);
+void readCheckPoints(string path, vector<zPoint> &checkpts, double &ox, double &oy);
 
 double ccltDistancePt2Sg(zPoint p, zPoint m, zPoint n);
+
+double ccltPtDistance2D(ePoint a, ePoint b);
 
 void ccltCheckDistances(vector<zPoint> checks, vector<vector<zSegment> > segments, vector<vector<double> > &distances);
 
 double ccltMaxOffset(eString &pts, int &pos_maxoft);
 
-void readEdges(string path, eString &pts, double &ox, double &oy);
+void preRead(string path, eString &pts, eString &pts2, double &ox, double &oy);
 
-void iterativeBreakLines(eString &oPts, eEdge &whole_edge);
+void findCenter(eString &left, eString &right, eString &center);
+
+void readEdges(string path, eString &pts, double &ox, double &oy, extent_dir &edir);
+
+void readEdges(eString &center, extent_dir &edir);
+
+void iterativeBreakLines(eString &oPts, eEdge &whole_edge, int th);
 
 bool compy(ePoint &a, ePoint &b);
 
+bool compx(ePoint &a, ePoint &b);
+
 bool compid(ePoint &a, ePoint &b);
 
+bool compdis(eDistance &a, eDistance &b);
+
+double medianNum(vector<double> &a);
+
 int zrand();
+
+void ccltNormalPara(eString &a, normalPara &para, const extent_dir &edir);
+
+void fitString(const eString &pts, polyPara &rst, polyPara &zrst, const normalPara &para, const extent_dir &edir);
+
+void fitEdge(const eEdge &edge, const double &ox, const double &oy, const extent_dir &dir);
+
+void solveFit(const vector<double> &xx, const vector<double> &yy, vector<double> &result);
+
+void addPoint(PointCloud<PointXYZI> &cloud, ePoint src, ePoint dst);
 
 #endif

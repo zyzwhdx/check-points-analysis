@@ -65,15 +65,27 @@ void main()
 	//dataIo dio;
 	//dio.writePointCloudIntoLasFile("curvature.las", curvatures, ox, oy);
 
-	double ox = 486000.0;
-	double oy = 3287000.0;
-
-	eString original_edges;
+	//offset value
+	double ox, oy;
+	eString right, left, center;
+	extent_dir e_dir;
 	eEdge final_edge;
-	readEdges("edges.txt", original_edges, ox, oy);
 
-	iterativeBreakLines(original_edges, final_edge);
+	preRead("edges.txt", right, left, ox, oy);
 
+	findCenter(left, right, center);
+
+	readEdges(center, e_dir);
+	
+	cout << "ox: " << to_string(ox) << endl;
+	cout << "oy: " << to_string(oy) << endl;
+	
+	int th;
+	cout << "threshold: ";
+	cin >> th;
+	
+	iterativeBreakLines(center, final_edge, th);
+	
 	ofstream ofs1("break.txt");
 	for (int i = 0; i < final_edge.size(); i++)
 	{
@@ -85,7 +97,9 @@ void main()
 	}
 	ofs1.close();
 
+	fitEdge(final_edge, ox, oy, e_dir);
+	
+	cin.get();
+	cin.get();
 	cout << "end of program" << endl;
-	cin.get();
-	cin.get();
 }
